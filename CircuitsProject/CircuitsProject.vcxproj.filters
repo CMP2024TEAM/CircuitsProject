@@ -24,6 +24,9 @@
     <ClCompile Include="Node.cpp">
       <Filter>Classes</Filter>
     </ClCompile>
+    <ClCompile Include="Sources.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
