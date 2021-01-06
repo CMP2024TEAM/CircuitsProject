@@ -147,7 +147,14 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ActiveElement.h" />
+    <ClInclude Include="Capacitor.h" />
+    <ClInclude Include="Element.h" />
+    <ClInclude Include="Global.h" />
+    <ClInclude Include="Inductor.h" />
     <ClInclude Include="Node.h" />
+    <ClInclude Include="PassiveElements.h" />
+    <ClInclude Include="Resestance.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

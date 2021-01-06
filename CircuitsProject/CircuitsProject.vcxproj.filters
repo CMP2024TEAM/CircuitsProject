@@ -32,5 +32,26 @@
     <ClInclude Include="Node.h">
       <Filter>Classes</Filter>
     </ClInclude>
+    <ClInclude Include="Element.h">
+      <Filter>Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="ActiveElement.h">
+      <Filter>Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="PassiveElements.h">
+      <Filter>Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="Global.h">
+      <Filter>Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="Resestance.h">
+      <Filter>Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="Capacitor.h">
+      <Filter>Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="Inductor.h">
+      <Filter>Classes</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
