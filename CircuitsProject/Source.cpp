@@ -1,10 +1,12 @@
-#include<Eigen/Dense>
+﻿#include<Eigen/Dense>
 #include<Eigen/sparse>
 #include<complex>
 #include<iostream>
 #include"Global.h"
 #include"Element.h"
 #include"Resestance.h"
+#include"Capacitor.h"
+#include"Inductor.h"
 #include"Sources.h"
 # define M_PI          3.141592653589793238462643383279502884L /* pi */
 using namespace std;
@@ -332,7 +334,7 @@ int main()
 			NodesCreated[N2] = true;
 			n++;
 		}
-		Elements[NumberOfElements] = new Resistance(Nodes[N1], Nodes[N2], name, ComplexValue);
+		Elements[NumberOfElements] = new Capacitor(Nodes[N1], Nodes[N2], name,Value);
 		NumberOfElements++;
 		}
 		else if (type == "ind")
@@ -383,7 +385,7 @@ int main()
 			NodesCreated[N2] = true;
 			n++;
 		}
-		Elements[NumberOfElements] = new Resistance(Nodes[N1], Nodes[N2], name, ComplexValue);
+		Elements[NumberOfElements] = new Inductor(Nodes[N1], Nodes[N2], name, Value);
 		NumberOfElements++;
 		}
 		else if (type == "vcvs")
@@ -495,4 +497,17 @@ isrc i2 0 2 7 0
 res r1 1 2 10
 res r2 0 1 2
 res r3 0 2 4
+
+(-7.33333,0)
+(-5.33333,0)
+(-5.86667,0)
+*/
+/*
+w 1
+vsrc v1 1 0 10 -45
+vsrc v2 3 0 5 -60
+cap c1 2 0 1
+res r1 1 2 3
+ind n1 2 3 1‏
+
 */
