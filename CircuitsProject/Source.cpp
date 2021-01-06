@@ -548,7 +548,6 @@ int main()
 	MatrixXcd D (m, m);
 	MatrixXcd i(n - 1, 1);
 	MatrixXcd e(m, 1);
-
 	i.setZero();
 	e.setZero();
 	G.setZero();
@@ -581,9 +580,7 @@ int main()
 			}
 		}
 	}
-
 	int Batterycount = 0;
-
 	for (int i = 0;i < NumberOfElements;i++)
 	{
 		VSRC* Ba = dynamic_cast<VSRC*>(Elements[i]);
@@ -591,11 +588,13 @@ int main()
 		{
 			if (Ba->GetStartNode()->GetID() != 0)
 			{
-				B(Ba->GetStartNode()->GetID() - 1, Batterycount) = 1.0;
+				B(Ba->GetStartNode()->GetID() - 1, Batterycount) += 1.0;
+				C(Batterycount, Ba->GetStartNode()->GetID() - 1) += 1.0;
 			}
 			if (Ba->GetEndNode()->GetID() != 0)
 			{
-				B(Ba->GetEndNode()->GetID() - 1, Batterycount) = -1.0;
+				B(Ba->GetEndNode()->GetID() - 1, Batterycount) += -1.0;
+				C(Batterycount, Ba->GetEndNode()->GetID() - 1) += -1.0;
 			}
 			e(Batterycount, 0) = Ba->Value;
 			Batterycount++;
@@ -614,10 +613,9 @@ int main()
 			{
 				i(Ba->GetEndNode()->GetID() - 1,0) -= Ba->Value;
 			}
-			
 		}
 	}
-	C = B.transpose();
+	//C = B.transpose();
 	MatrixXcd A(n - 1 + m, n - 1 + m);
 	A << G, B, C, D;
 	MatrixXcd z(n - 1 + m, 1);
