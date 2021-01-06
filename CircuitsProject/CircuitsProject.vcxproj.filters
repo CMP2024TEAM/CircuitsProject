@@ -53,5 +53,8 @@
     <ClInclude Include="Inductor.h">
       <Filter>Classes</Filter>
     </ClInclude>
+    <ClInclude Include="Sources.h">
+      <Filter>Classes</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -8,8 +8,6 @@ public:
 	~ActiveElement();
 
 protected:
-	
-
 
 };
 

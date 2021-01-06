@@ -6,15 +6,13 @@ class Element
 {
 public:
 	Element(Node* StartNd, Node* EndNd,string);
-	~Element();
-
+	virtual ~Element();
+	Node* GetStartNode();
+	Node* GetEndNode();
 protected:
 	Node* StartNode;
 	Node* EndNode;
 	string Name;
-	
-
-
 };
 
 Element::Element(Node* StartNd,Node* EndNd,string nm)
@@ -24,7 +22,14 @@ Element::Element(Node* StartNd,Node* EndNd,string nm)
 	Name = nm;
 
 }
-
+Node* Element::GetStartNode()
+{
+	return StartNode;
+}
+Node* Element::GetEndNode()
+{
+	return EndNode;
+}
 Element::~Element()
 {
 }

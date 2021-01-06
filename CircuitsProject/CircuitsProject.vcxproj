@@ -155,6 +155,7 @@
     <ClInclude Include="Node.h" />
     <ClInclude Include="PassiveElements.h" />
     <ClInclude Include="Resestance.h" />
+    <ClInclude Include="Sources.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
