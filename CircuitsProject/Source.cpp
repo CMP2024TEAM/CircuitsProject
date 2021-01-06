@@ -623,6 +623,7 @@ int main()
 			e(Batterycount, 0) = 0;
 			Batterycount++;
 		}
+		
 	}
 	for (int j = 0; j < NumberOfElements; j++)
 	{
@@ -637,6 +638,36 @@ int main()
 			{
 				i(Ba->GetEndNode()->GetID() - 1,0) -= Ba->Value;
 			}
+		}
+		VCCS* Bat = dynamic_cast<VCCS*>(Elements[j]);
+		if (Bat != NULL)
+		{
+			if (Bat->GetStartNode()->GetID() != 0)
+			{
+				if (Bat->Dstart->GetID() != 0)
+				{
+					G(Bat->GetStartNode()->GetID() - 1, Bat->Dstart->GetID() - 1) += Bat->Coff;
+				}
+				if (Bat->Dend->GetID() != 0)
+				{
+					G(Bat->GetStartNode()->GetID() - 1, Bat->Dend->GetID() - 1) -= Bat->Coff;
+				}
+
+			}
+			
+			if (Bat->GetEndNode()->GetID() != 0)
+			{
+				if (Bat->Dstart->GetID() != 0)
+				{
+					G(Bat->GetEndNode()->GetID() - 1, Bat->Dstart->GetID() - 1) -= Bat->Coff;
+				}
+				if (Bat->Dend->GetID() != 0)
+				{
+					G(Bat->GetEndNode()->GetID() - 1, Bat->Dend->GetID() - 1) += Bat->Coff;
+				}
+
+			}
+			
 		}
 	}
 
@@ -693,4 +724,14 @@ ind i3 2 0 2
 isrc i1 1 0 10 -90
 cap c1 1 2 0.2
 vcvs v1 3 0 1 0 3
+*/
+
+/*
+W 0
+res r1 1 2 2
+res r2 0 2 1
+res r3 2 3 8
+res r4 1 3 4
+isrc i1 1 0 3 0
+vccs v1 3 0 1 2 2
 */
