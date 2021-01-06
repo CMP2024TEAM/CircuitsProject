@@ -24,9 +24,9 @@ class ISRC : public ActiveElement
 public:
 	ISRC(Node* SNode, Node* ENode, string name, complex<double> value);
 	~ISRC();
-
-private:
 	complex<double> Value;
+private:
+	
 };
 
 ISRC::ISRC(Node* SNode, Node* ENode, string name, complex<double> value) : ActiveElement(SNode, ENode, name)

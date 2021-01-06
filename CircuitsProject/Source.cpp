@@ -173,7 +173,65 @@ int main()
 		}
 		else if (type=="isrc")
 		{
-
+			string node1 = "", node2 = "", v = "", phase = "";
+			for (; i < s.length(); i++)
+			{
+				if (s[i] == ' ')
+				{
+					break;
+				}
+				node1 += s[i];
+			}
+			i++;
+			for (; i < s.length(); i++)
+			{
+				if (s[i] == ' ')
+				{
+					break;
+				}
+				node2 += s[i];
+			}
+			i++;
+			for (; i < s.length(); i++)
+			{
+				if (s[i] == ' ')
+				{
+					break;
+				}
+				v += s[i];
+			}
+			i++;
+			for (; i < s.length(); i++)
+			{
+				if (s[i] == ' ')
+				{
+					break;
+				}
+				phase += s[i];
+			}
+			int N1, N2;
+			double Value;
+			double Phase;
+			N1 = (int)stod(node1);
+			N2 = (int)stod(node2);
+			Value = stod(v);
+			Phase = stod(phase);
+			complex<double> ComplexValue = polar(Value, ToRadian(Phase));
+			if (NodesCreated[N1] == false)
+			{
+				Nodes[N1] = new Node(N1);
+				NodesCreated[N1] = true;
+				n++;
+			}
+			if (NodesCreated[N2] == false)
+			{
+				Nodes[N2] = new Node(N2);
+				NodesCreated[N2] = true;
+				n++;
+			}
+			Elements[NumberOfElements] = new ISRC(Nodes[N1], Nodes[N2], name, ComplexValue);
+			NumberOfElements++;
+			
 		}
 		else if (type=="res")
 		{
@@ -228,11 +286,105 @@ int main()
 		}
 		else if (type=="cap")
 		{
-
+		string node1 = "", node2 = "", v = "";
+		for (; i < s.length(); i++)
+		{
+			if (s[i] == ' ')
+			{
+				break;
+			}
+			node1 += s[i];
+		}
+		i++;
+		for (; i < s.length(); i++)
+		{
+			if (s[i] == ' ')
+			{
+				break;
+			}
+			node2 += s[i];
+		}
+		i++;
+		for (; i < s.length(); i++)
+		{
+			if (s[i] == ' ')
+			{
+				break;
+			}
+			v += s[i];
+		}
+		int N1, N2;
+		double Value;
+		double Phase;
+		N1 = (int)stod(node1);
+		N2 = (int)stod(node2);
+		Value = stod(v);
+		complex<double> ComplexValue = Value;
+		if (NodesCreated[N1] == false)
+		{
+			Nodes[N1] = new Node(N1);
+			NodesCreated[N1] = true;
+			n++;
+		}
+		if (NodesCreated[N2] == false)
+		{
+			Nodes[N2] = new Node(N2);
+			NodesCreated[N2] = true;
+			n++;
+		}
+		Elements[NumberOfElements] = new Resistance(Nodes[N1], Nodes[N2], name, ComplexValue);
+		NumberOfElements++;
 		}
 		else if (type == "ind")
 		{
-
+		string node1 = "", node2 = "", v = "";
+		for (; i < s.length(); i++)
+		{
+			if (s[i] == ' ')
+			{
+				break;
+			}
+			node1 += s[i];
+		}
+		i++;
+		for (; i < s.length(); i++)
+		{
+			if (s[i] == ' ')
+			{
+				break;
+			}
+			node2 += s[i];
+		}
+		i++;
+		for (; i < s.length(); i++)
+		{
+			if (s[i] == ' ')
+			{
+				break;
+			}
+			v += s[i];
+		}
+		int N1, N2;
+		double Value;
+		double Phase;
+		N1 = (int)stod(node1);
+		N2 = (int)stod(node2);
+		Value = stod(v);
+		complex<double> ComplexValue = Value;
+		if (NodesCreated[N1] == false)
+		{
+			Nodes[N1] = new Node(N1);
+			NodesCreated[N1] = true;
+			n++;
+		}
+		if (NodesCreated[N2] == false)
+		{
+			Nodes[N2] = new Node(N2);
+			NodesCreated[N2] = true;
+			n++;
+		}
+		Elements[NumberOfElements] = new Resistance(Nodes[N1], Nodes[N2], name, ComplexValue);
+		NumberOfElements++;
 		}
 		else if (type == "vcvs")
 		{
@@ -251,18 +403,21 @@ int main()
 
 		}
 	} while (s != "");
+
 	MatrixXcd G (n-1, n-1);
 	MatrixXcd B (n-1, m);
 	MatrixXcd C (m, n-1);
 	MatrixXcd D (m, m);
 	MatrixXcd i(n - 1, 1);
 	MatrixXcd e(m, 1);
+
 	i.setZero();
 	e.setZero();
 	G.setZero();
 	B.setZero();
 	C.setZero();
 	D.setZero();
+
 	for (int i = 0;i < n-1;i++)
 	{
 		for (int j = i;j < n-1;j++)
@@ -288,7 +443,9 @@ int main()
 			}
 		}
 	}
+
 	int Batterycount = 0;
+
 	for (int i = 0;i < NumberOfElements;i++)
 	{
 		VSRC* Ba = dynamic_cast<VSRC*>(Elements[i]);
@@ -306,6 +463,22 @@ int main()
 			Batterycount++;
 		}
 	}
+	for (int j = 0; j < NumberOfElements; j++)
+	{
+		ISRC* Ba = dynamic_cast<ISRC*>(Elements[j]);
+		if (Ba != NULL)
+		{
+			if (Ba->GetStartNode()->GetID() != 0)
+			{
+				i(Ba->GetStartNode()->GetID() - 1, 0) += Ba->Value;
+			}
+			if (Ba->GetEndNode()->GetID() != 0)
+			{
+				i(Ba->GetEndNode()->GetID() - 1,0) -= Ba->Value;
+			}
+			
+		}
+	}
 	C = B.transpose();
 	MatrixXcd A(n - 1 + m, n - 1 + m);
 	A << G, B, C, D;
@@ -314,3 +487,12 @@ int main()
 	cout << A.inverse() * z << endl;
 	return 0;
 }
+/*
+w 0
+vsrc v1 2 1 2 0
+isrc i1 1 0 2 0
+isrc i2 0 2 7 0
+res r1 1 2 10
+res r2 0 1 2
+res r3 0 2 4
+*/
