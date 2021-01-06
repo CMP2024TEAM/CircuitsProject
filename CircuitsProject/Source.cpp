@@ -390,11 +390,147 @@ int main()
 		}
 		else if (type == "vcvs")
 		{
+		string node1 = "", node2 = "", v = "",node3="",node4="";
+		for (; i < s.length(); i++)
+		{
+			if (s[i] == ' ')
+			{
+				break;
+			}
+			node1 += s[i];
+		}
+		i++;
+		for (; i < s.length(); i++)
+		{
+			if (s[i] == ' ')
+			{
+				break;
+			}
+			node2 += s[i];
+		}
+		i++;
+		for (; i < s.length(); i++)
+		{
+			if (s[i] == ' ')
+			{
+				break;
+			}
+			node3 += s[i];
+		}
+		i++;
+		for (; i < s.length(); i++)
+		{
+			if (s[i] == ' ')
+			{
+				break;
+			}
+			node4 += s[i];
+		}
+		i++;
+		for (; i < s.length(); i++)
+		{
+			if (s[i] == ' ')
+			{
+				break;
+			}
+			v += s[i];
+		}
+		i++;
+		int N1, N2,N3,N4;
+		double Value;
+		double Phase;
+		N1 = (int)stod(node1);
+		N2 = (int)stod(node2);
+		N3 = (int)stod(node3);
+		N4 = (int)stod(node4);
+		Value = stod(v);
+		if (NodesCreated[N1] == false)
+		{
+			Nodes[N1] = new Node(N1);
+			NodesCreated[N1] = true;
+			n++;
+		}
+		if (NodesCreated[N2] == false)
+		{
+			Nodes[N2] = new Node(N2);
+			NodesCreated[N2] = true;
+			n++;
+		}
+		Elements[NumberOfElements] = new VCVS(Nodes[N1], Nodes[N2], name,Value,Nodes[N3],Nodes[N4]);
+		NumberOfElements++;
+		m++;
 
 		}
 		else if (type == "vccs")
 		{
-
+		string node1 = "", node2 = "", v = "", node3 = "", node4 = "";
+		for (; i < s.length(); i++)
+		{
+			if (s[i] == ' ')
+			{
+				break;
+			}
+			node1 += s[i];
+		}
+		i++;
+		for (; i < s.length(); i++)
+		{
+			if (s[i] == ' ')
+			{
+				break;
+			}
+			node2 += s[i];
+		}
+		i++;
+		for (; i < s.length(); i++)
+		{
+			if (s[i] == ' ')
+			{
+				break;
+			}
+			node3 += s[i];
+		}
+		i++;
+		for (; i < s.length(); i++)
+		{
+			if (s[i] == ' ')
+			{
+				break;
+			}
+			node4 += s[i];
+		}
+		i++;
+		for (; i < s.length(); i++)
+		{
+			if (s[i] == ' ')
+			{
+				break;
+			}
+			v += s[i];
+		}
+		i++;
+		int N1, N2, N3, N4;
+		double Value;
+		double Phase;
+		N1 = (int)stod(node1);
+		N2 = (int)stod(node2);
+		N3 = (int)stod(node3);
+		N4 = (int)stod(node4);
+		Value = stod(v);
+		if (NodesCreated[N1] == false)
+		{
+			Nodes[N1] = new Node(N1);
+			NodesCreated[N1] = true;
+			n++;
+		}
+		if (NodesCreated[N2] == false)
+		{
+			Nodes[N2] = new Node(N2);
+			NodesCreated[N2] = true;
+			n++;
+		}
+		Elements[NumberOfElements] = new VCCS(Nodes[N1], Nodes[N2], name, Value, Nodes[N3], Nodes[N4]);
+		NumberOfElements++;
 		}
 		else if (type == "ccvs")
 		{
