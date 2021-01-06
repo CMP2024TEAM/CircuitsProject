@@ -534,7 +534,73 @@ int main()
 		}
 		else if (type == "ccvs")
 		{
-
+		string node1 = "", node2 = "", v = "", node3 = "", node4 = "";
+		for (; i < s.length(); i++)
+		{
+			if (s[i] == ' ')
+			{
+				break;
+			}
+			node1 += s[i];
+		}
+		i++;
+		for (; i < s.length(); i++)
+		{
+			if (s[i] == ' ')
+			{
+				break;
+			}
+			node2 += s[i];
+		}
+		i++;
+		for (; i < s.length(); i++)
+		{
+			if (s[i] == ' ')
+			{
+				break;
+			}
+			node3 += s[i];
+		}
+		i++;
+		for (; i < s.length(); i++)
+		{
+			if (s[i] == ' ')
+			{
+				break;
+			}
+			node4 += s[i];
+		}
+		i++;
+		for (; i < s.length(); i++)
+		{
+			if (s[i] == ' ')
+			{
+				break;
+			}
+			v += s[i];
+		}
+		int N1, N2, N3, N4;
+		double Value;
+		double Phase;
+		N1 = (int)stod(node1);
+		N2 = (int)stod(node2);
+		N3 = (int)stod(node3);
+		N4 = (int)stod(node4);
+		Value = stod(v);
+		if (NodesCreated[N1] == false)
+		{
+			Nodes[N1] = new Node(N1);
+			NodesCreated[N1] = true;
+			n++;
+		}
+		if (NodesCreated[N2] == false)
+		{
+			Nodes[N2] = new Node(N2);
+			NodesCreated[N2] = true;
+			n++;
+		}
+		Elements[NumberOfElements] = new CCVS(Nodes[N1], Nodes[N2], name, Value, Nodes[N3], Nodes[N4]);
+		NumberOfElements++;
 		}
 		else if (type == "cccs")
 		{
@@ -623,7 +689,36 @@ int main()
 			e(Batterycount, 0) = 0;
 			Batterycount++;
 		}
-		
+		CCVS* Bate = dynamic_cast<CCVS*>(Elements[i]);
+		if (Bate != NULL)
+		{
+			int bat_count = 0;
+			for (int i = 1; i <11; i++)
+			{
+				Element* element = dynamic_cast<ActiveElement*>(Elements[i]);
+				
+				if (element != NULL)
+				{
+					bat_count++;
+					if (Bate->Dstart->GetID() == Elements[i]->GetStartNode()->GetID() && Bate->Dend->GetID() == Elements[i]->GetEndNode()->GetID())
+					{
+						break;
+					}
+				}
+		}
+			if (Bate->GetStartNode()->GetID() != 0)
+			{
+				B(Bate->GetStartNode()->GetID() - 1, Batterycount) += 1.0;
+				C(Batterycount, Bate->GetStartNode()->GetID() - 1) += 1.0;
+				D(Batterycount, bat_count) -= Bate->Coff;
+			}
+			if (Bate->GetEndNode()->GetID() != 0)
+			{
+				B(Bate->GetEndNode()->GetID() - 1, Batterycount) += -1.0;
+				C(Batterycount, Bate->GetEndNode()->GetID() - 1) += -1.0;
+				D(Batterycount, bat_count) -= Bate->Coff;
+			}
+		}
 	}
 	for (int j = 0; j < NumberOfElements; j++)
 	{

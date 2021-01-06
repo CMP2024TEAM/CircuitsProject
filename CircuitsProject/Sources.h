@@ -82,3 +82,26 @@ VCCS::VCCS(Node* SNode, Node* ENode, string name, double coff, Node* thestart, N
 VCCS::~VCCS()
 {
 }
+class CCVS : public ActiveElement
+{
+public:
+	CCVS(Node* SNode, Node* ENode, string name, double coff, Node* thestart, Node* theend);
+	~CCVS();
+	
+	double Coff;
+	Node* Dstart;
+	Node* Dend;
+private:
+
+};
+CCVS::CCVS(Node* SNode, Node* ENode, string name, double coff, Node* thestart, Node* theend) : ActiveElement(SNode, ENode, name)
+{
+	Coff = coff;
+	Dstart = thestart;
+	Dend = theend;
+
+
+}
+CCVS::~CCVS()
+{
+}
