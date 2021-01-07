@@ -611,6 +611,7 @@ int main()
 		}
 		Elements[NumberOfElements] = new CCVS(Nodes[N1], Nodes[N2], name,DN, Value, Nodes[N3], Nodes[N4]);
 		NumberOfElements++;
+		m++;
 		}
 		else if (type == "cccs")
 		{
@@ -681,7 +682,6 @@ int main()
 		}
 		Elements[NumberOfElements] = new CCCS(Nodes[N1], Nodes[N2], name, Value, Nodes[N3], Nodes[N4]);
 		NumberOfElements++;
-
 		}
 	} while (s != "");
 
@@ -956,9 +956,19 @@ res r4 2 3 8
 isrc i1 0 1 3 0
 cccs c1 0 3 1 2 2
 */
-/*w 0
+/*
+input
+w 0
 vsrc V1 1 0 12 0
 res R1 1 2 1000
 res R2 2 0 1000
 res R3 3 0 1000
-ccvs Ha 3 2 1 0 V1 5‏*/
+ccvs Ha 3 2 1 0 V1 5‏
+
+final answer
+(12,0)
+(4.01331,0)
+(3.97338,0)
+(-0.00798669,0)
+(-0.00397338,0)
+*/
