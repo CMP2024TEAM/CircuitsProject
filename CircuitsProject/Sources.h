@@ -6,6 +6,7 @@ public:
 	VSRC(Node* SNode,Node* ENode,string name,complex<double> value);
 	~VSRC();
 	complex<double> Value;
+	int index;
 private:
 
 };
@@ -45,6 +46,7 @@ public:
 	double Coff;
 	Node* Dstart;
 	Node* Dend;
+	int index;
 private:
 
 };
@@ -85,23 +87,47 @@ VCCS::~VCCS()
 class CCVS : public ActiveElement
 {
 public:
-	CCVS(Node* SNode, Node* ENode, string name, double coff, Node* thestart, Node* theend);
+	CCVS(Node* SNode, Node* ENode, string name,string dname ,double coff, Node* thestart, Node* theend);
 	~CCVS();
 	
+	double Coff;
+	Node* Dstart;
+	Node* Dend;
+	string DName;
+	int index;
+private:
+
+};
+CCVS::CCVS(Node* SNode, Node* ENode, string name, string dname,double coff, Node* thestart, Node* theend) : ActiveElement(SNode, ENode, name)
+{
+	Coff = coff;
+	Dstart = thestart;
+	Dend = theend;
+	DName = dname;
+
+}
+CCVS::~CCVS()
+{
+}
+class CCCS :public ActiveElement
+{
+public:
+	CCCS(Node* SNode, Node* ENode, string name, double coff, Node* thestart, Node* theend);
+	~CCCS();
 	double Coff;
 	Node* Dstart;
 	Node* Dend;
 private:
 
 };
-CCVS::CCVS(Node* SNode, Node* ENode, string name, double coff, Node* thestart, Node* theend) : ActiveElement(SNode, ENode, name)
+
+CCCS::CCCS(Node* SNode, Node* ENode, string name, double coff, Node* thestart, Node* theend):ActiveElement(SNode, ENode, name)
 {
 	Coff = coff;
 	Dstart = thestart;
 	Dend = theend;
-
-
 }
-CCVS::~CCVS()
+
+CCCS::~CCCS()
 {
 }

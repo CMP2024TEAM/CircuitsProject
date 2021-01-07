@@ -9,10 +9,11 @@ public:
 	virtual ~Element();
 	Node* GetStartNode();
 	Node* GetEndNode();
+	string Name;
 protected:
 	Node* StartNode;
 	Node* EndNode;
-	string Name;
+	
 };
 
 Element::Element(Node* StartNd,Node* EndNd,string nm)

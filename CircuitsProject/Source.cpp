@@ -517,6 +517,7 @@ int main()
 		N3 = (int)stod(node3);
 		N4 = (int)stod(node4);
 		Value = stod(v);
+
 		if (NodesCreated[N1] == false)
 		{
 			Nodes[N1] = new Node(N1);
@@ -533,6 +534,85 @@ int main()
 		NumberOfElements++;
 		}
 		else if (type == "ccvs")
+		{
+		string node1 = "", node2 = "", v = "", node3 = "", node4 = "",DN="";
+		for (; i < s.length(); i++)
+		{
+			if (s[i] == ' ')
+			{
+				break;
+			}
+			node1 += s[i];
+		}
+		i++;
+		for (; i < s.length(); i++)
+		{
+			if (s[i] == ' ')
+			{
+				break;
+			}
+			node2 += s[i];
+		}
+		i++;
+		for (; i < s.length(); i++)
+		{
+			if (s[i] == ' ')
+			{
+				break;
+			}
+			node3 += s[i];
+		}
+		i++;
+		for (; i < s.length(); i++)
+		{
+			if (s[i] == ' ')
+			{
+				break;
+			}
+			node4 += s[i];
+		}
+		i++;
+		for (; i < s.length(); i++)
+		{
+			if (s[i] == ' ')
+			{
+				break;
+			}
+			DN+= s[i];
+		}
+		i++;
+		for (; i < s.length(); i++)
+		{
+			if (s[i] == ' ')
+			{
+				break;
+			}
+			v += s[i];
+		}
+		int N1, N2, N3, N4;
+		double Value;
+		double Phase;
+		N1 = (int)stod(node1);
+		N2 = (int)stod(node2);
+		N3 = (int)stod(node3);
+		N4 = (int)stod(node4);
+		Value = stod(v);
+		if (NodesCreated[N1] == false)
+		{
+			Nodes[N1] = new Node(N1);
+			NodesCreated[N1] = true;
+			n++;
+		}
+		if (NodesCreated[N2] == false)
+		{
+			Nodes[N2] = new Node(N2);
+			NodesCreated[N2] = true;
+			n++;
+		}
+		Elements[NumberOfElements] = new CCVS(Nodes[N1], Nodes[N2], name,DN, Value, Nodes[N3], Nodes[N4]);
+		NumberOfElements++;
+		}
+		else if (type == "cccs")
 		{
 		string node1 = "", node2 = "", v = "", node3 = "", node4 = "";
 		for (; i < s.length(); i++)
@@ -599,11 +679,8 @@ int main()
 			NodesCreated[N2] = true;
 			n++;
 		}
-		Elements[NumberOfElements] = new CCVS(Nodes[N1], Nodes[N2], name, Value, Nodes[N3], Nodes[N4]);
+		Elements[NumberOfElements] = new CCCS(Nodes[N1], Nodes[N2], name, Value, Nodes[N3], Nodes[N4]);
 		NumberOfElements++;
-		}
-		else if (type == "cccs")
-		{
 
 		}
 	} while (s != "");
@@ -663,6 +740,7 @@ int main()
 				C(Batterycount, Ba->GetEndNode()->GetID() - 1) += -1.0;
 			}
 			e(Batterycount, 0) = Ba->Value;
+			Ba->index = Batterycount;
 			Batterycount++;
 		}
 		VCVS* Bat = dynamic_cast<VCVS*>(Elements[i]);
@@ -687,37 +765,28 @@ int main()
 				C(Batterycount, Bat->Dend->ID - 1) += Bat->Coff;
 			}
 			e(Batterycount, 0) = 0;
+			Bat->index = Batterycount;
 			Batterycount++;
 		}
+		
 		CCVS* Bate = dynamic_cast<CCVS*>(Elements[i]);
+	
 		if (Bate != NULL)
 		{
-			int bat_count = 0;
-			for (int i = 1; i <11; i++)
-			{
-				Element* element = dynamic_cast<ActiveElement*>(Elements[i]);
-				
-				if (element != NULL)
-				{
-					bat_count++;
-					if (Bate->Dstart->GetID() == Elements[i]->GetStartNode()->GetID() && Bate->Dend->GetID() == Elements[i]->GetEndNode()->GetID())
-					{
-						break;
-					}
-				}
-		}
+			
 			if (Bate->GetStartNode()->GetID() != 0)
 			{
 				B(Bate->GetStartNode()->GetID() - 1, Batterycount) += 1.0;
 				C(Batterycount, Bate->GetStartNode()->GetID() - 1) += 1.0;
-				D(Batterycount, bat_count) -= Bate->Coff;
 			}
 			if (Bate->GetEndNode()->GetID() != 0)
 			{
 				B(Bate->GetEndNode()->GetID() - 1, Batterycount) += -1.0;
 				C(Batterycount, Bate->GetEndNode()->GetID() - 1) += -1.0;
-				D(Batterycount, bat_count) -= Bate->Coff;
 			}
+			e(Batterycount, 0) = 0;
+			Bate->index = Batterycount;
+			Batterycount++;
 		}
 	}
 	for (int j = 0; j < NumberOfElements; j++)
@@ -733,6 +802,21 @@ int main()
 			{
 				i(Ba->GetEndNode()->GetID() - 1,0) -= Ba->Value;
 			}
+		}
+		CCCS* Bater = dynamic_cast<CCCS*>(Elements[j]);
+		if (Bater != NULL)
+		{
+			if (Bater->GetStartNode()->GetID() != 0)
+			{
+				B(Bater->GetStartNode()->GetID() - 1, Batterycount) += Bater->Coff;
+				C(Batterycount, Bater->GetStartNode()->GetID() - 1) += Bater->Coff;
+			}
+			if (Ba->GetEndNode()->GetID() != 0)
+			{
+				B(Bater->GetEndNode()->GetID() - 1, Batterycount) += Bater->Coff;
+				C(Batterycount, Bater->GetEndNode()->GetID() - 1) += Bater->Coff;
+			}
+			Batterycount++;
 		}
 		VCCS* Bat = dynamic_cast<VCCS*>(Elements[j]);
 		if (Bat != NULL)
@@ -765,7 +849,31 @@ int main()
 			
 		}
 	}
-
+	for (int k = 0; k < NumberOfElements; k++)
+	{
+		CCVS* Bate = dynamic_cast<CCVS*>(Elements[k]);
+		if (Bate != NULL)
+		{
+			for (int l = 0; l < NumberOfElements; l++)
+			{
+				if (Bate->DName == Elements[l]->Name)
+				{
+					VSRC* v1 = dynamic_cast<VSRC*>(Elements[l]);
+					if (v1)
+					{
+						D(Bate->index, v1->index)-=Bate->Coff;
+					}
+					else
+					{
+						VCVS* v2 = dynamic_cast<VCVS*>(Elements[l]);
+						D(Bate->index, v2->index) -= Bate->Coff;
+					}
+				}
+					
+			}
+			
+		}
+	}
 	//C = B.transpose();
 	MatrixXcd A(n - 1 + m, n - 1 + m);
 	A << G, B, C, D;
@@ -830,3 +938,27 @@ res r4 1 3 4
 isrc i1 1 0 3 0
 vccs v1 3 0 1 2 2
 */
+/*
+W 0
+res r1 1 2 2
+res r2 0 2 1
+res r3 1 3 4
+res r4 2 3 8
+isrc i1 0 1 3 0
+ccvs c1 0 3 1 2 2
+*/
+/*
+W 0
+res r1 1 2 2
+res r2 0 2 1
+res r3 1 3 4
+res r4 2 3 8
+isrc i1 0 1 3 0
+cccs c1 0 3 1 2 2
+*/
+/*w 0
+vsrc V1 1 0 12 0
+res R1 1 2 1000
+res R2 2 0 1000
+res R3 3 0 1000
+ccvs Ha 3 2 1 0 V1 5‏*/
