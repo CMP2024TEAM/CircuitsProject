@@ -112,20 +112,22 @@ CCVS::~CCVS()
 class CCCS :public ActiveElement
 {
 public:
-	CCCS(Node* SNode, Node* ENode, string name, double coff, Node* thestart, Node* theend);
+	CCCS(Node* SNode, Node* ENode, string name, string dname, double coff, Node* thestart, Node* theend);
 	~CCCS();
 	double Coff;
 	Node* Dstart;
 	Node* Dend;
+	string DName;
 private:
 
 };
 
-CCCS::CCCS(Node* SNode, Node* ENode, string name, double coff, Node* thestart, Node* theend):ActiveElement(SNode, ENode, name)
+CCCS::CCCS(Node* SNode, Node* ENode, string name, string dname, double coff, Node* thestart, Node* theend):ActiveElement(SNode, ENode, name)
 {
 	Coff = coff;
 	Dstart = thestart;
 	Dend = theend;
+	DName = dname;
 }
 
 CCCS::~CCCS()

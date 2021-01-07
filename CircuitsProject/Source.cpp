@@ -616,73 +616,83 @@ int main()
 		}
 		else if (type == "cccs")
 		{
-			string node1 = "", node2 = "", v = "", node3 = "", node4 = "";
-			for (; i < s.length(); i++)
+		string node1 = "", node2 = "", v = "", node3 = "", node4 = "", DN = "";
+		for (; i < s.length(); i++)
+		{
+			if (s[i] == ' ')
 			{
-				if (s[i] == ' ')
-				{
-					break;
-				}
-				node1 += s[i];
+				break;
 			}
-			i++;
-			for (; i < s.length(); i++)
+			node1 += s[i];
+		}
+		i++;
+		for (; i < s.length(); i++)
+		{
+			if (s[i] == ' ')
 			{
-				if (s[i] == ' ')
-				{
-					break;
-				}
-				node2 += s[i];
+				break;
 			}
-			i++;
-			for (; i < s.length(); i++)
+			node2 += s[i];
+		}
+		i++;
+		for (; i < s.length(); i++)
+		{
+			if (s[i] == ' ')
 			{
-				if (s[i] == ' ')
-				{
-					break;
-				}
-				node3 += s[i];
+				break;
 			}
-			i++;
-			for (; i < s.length(); i++)
+			node3 += s[i];
+		}
+		i++;
+		for (; i < s.length(); i++)
+		{
+			if (s[i] == ' ')
 			{
-				if (s[i] == ' ')
-				{
-					break;
-				}
-				node4 += s[i];
+				break;
 			}
-			i++;
-			for (; i < s.length(); i++)
+			node4 += s[i];
+		}
+		i++;
+		for (; i < s.length(); i++)
+		{
+			if (s[i] == ' ')
 			{
-				if (s[i] == ' ')
-				{
-					break;
-				}
-				v += s[i];
+				break;
 			}
-			int N1, N2, N3, N4;
-			double Value;
-			double Phase;
-			N1 = (int)stod(node1);
-			N2 = (int)stod(node2);
-			N3 = (int)stod(node3);
-			N4 = (int)stod(node4);
-			Value = stod(v);
-			if (NodesCreated[N1] == false)
+			DN += s[i];
+		}
+		i++;
+		for (; i < s.length(); i++)
+		{
+			if (s[i] == ' ')
 			{
-				Nodes[N1] = new Node(N1);
-				NodesCreated[N1] = true;
-				n++;
+				break;
 			}
-			if (NodesCreated[N2] == false)
-			{
-				Nodes[N2] = new Node(N2);
-				NodesCreated[N2] = true;
-				n++;
-			}
-			Elements[NumberOfElements] = new CCCS(Nodes[N1], Nodes[N2], name, Value, Nodes[N3], Nodes[N4]);
-			NumberOfElements++;
+			v += s[i];
+		}
+		int N1, N2, N3, N4;
+		double Value;
+		double Phase;
+		N1 = (int)stod(node1);
+		N2 = (int)stod(node2);
+		N3 = (int)stod(node3);
+		N4 = (int)stod(node4);
+		Value = stod(v);
+		if (NodesCreated[N1] == false)
+		{
+			Nodes[N1] = new Node(N1);
+			NodesCreated[N1] = true;
+			n++;
+		}
+		if (NodesCreated[N2] == false)
+		{
+			Nodes[N2] = new Node(N2);
+			NodesCreated[N2] = true;
+			n++;
+		}
+
+		Elements[NumberOfElements] = new CCCS(Nodes[N1], Nodes[N2], name, DN, Value, Nodes[N3], Nodes[N4]);
+		NumberOfElements++;
 		}
 	} while (s != "");
 
@@ -708,6 +718,27 @@ int main()
 						m++;
 						n++;
 						
+					}
+				}
+		CCCS* batr1 = dynamic_cast<CCCS*> (Elements[l]);
+		if (batr1 != NULL)
+			for (int k = 0; k < NumberOfElements; k++)
+				if (Elements[k]->Name == batr1->DName)
+				{
+					VSRC* batar1 = dynamic_cast<VSRC*>(Elements[k]);
+					CCVS* batar2 = dynamic_cast<CCVS*>(Elements[k]);
+					VCVS* batar3 = dynamic_cast<VCVS*>(Elements[k]);
+					if (batar1 == NULL && batar2 == NULL && batar3 == NULL)
+					{
+
+						Nodes[n] = new Node(n);
+						Elements[NumberOfElements] = new VSRC(Elements[k]->GetStartNode(), Nodes[n], Elements[k]->Name + "src", 0.0);
+						Elements[k]->setStartNode(Nodes[n]);
+						batr1->DName = Elements[NumberOfElements]->Name;
+						NumberOfElements++;
+						m++;
+						n++;
+
 					}
 				}
 	}
@@ -811,6 +842,7 @@ int main()
 			Bate->index = Batterycount;
 			Batterycount++;
 		}
+	
 	}
 	for (int j = 0; j < NumberOfElements; j++)
 	{
@@ -825,6 +857,21 @@ int main()
 			{
 				i(Ba->GetEndNode()->GetID() - 1, 0) -= Ba->Value;
 			}
+		}
+		CCCS* Bater = dynamic_cast<CCCS*>(Elements[j]);
+		if (Bater != NULL)
+		{
+			if (Bater->GetStartNode()->GetID() != 0)
+			{
+				int x = Bater->GetStartNode()->GetID() - 1;
+				B(x, Batterycount) -= Bater->Coff;
+			}
+			if (Bater->GetEndNode()->GetID() != 0)
+			{
+				B(Bater->GetEndNode()->GetID() - 1, Batterycount) += Bater->Coff;
+			}
+			e(Batterycount, 0) = 0;
+
 		}
 		/*CCCS* Bater = dynamic_cast<CCCS*>(Elements[j]);
 		if (Bater != NULL)
@@ -869,7 +916,8 @@ int main()
 			}
 		}*/
 	}
-	for (int k = 0; k < NumberOfElements; k++)
+
+	for (int k = 0; k < NumberOfElements; k++) //Fill D Elements
 	{
 		CCVS* Bate = dynamic_cast<CCVS*>(Elements[k]);
 		if (Bate != NULL)
