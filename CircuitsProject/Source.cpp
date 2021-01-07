@@ -681,10 +681,8 @@ int main()
 		}
 		Elements[NumberOfElements] = new CCCS(Nodes[N1], Nodes[N2], name, Value, Nodes[N3], Nodes[N4]);
 		NumberOfElements++;
-
 		}
 	} while (s != "");
-
 	MatrixXcd G (n-1, n-1);
 	MatrixXcd B (n-1, m);
 	MatrixXcd C (m, n-1);
@@ -697,7 +695,6 @@ int main()
 	B.setZero();
 	C.setZero();
 	D.setZero();
-
 	for (int i = 0;i < n-1;i++)
 	{
 		for (int j = i;j < n-1;j++)
@@ -768,15 +765,13 @@ int main()
 			Bat->index = Batterycount;
 			Batterycount++;
 		}
-		
 		CCVS* Bate = dynamic_cast<CCVS*>(Elements[i]);
-	
 		if (Bate != NULL)
 		{
-			
 			if (Bate->GetStartNode()->GetID() != 0)
 			{
-				B(Bate->GetStartNode()->GetID() - 1, Batterycount) += 1.0;
+				int x = Bate->GetStartNode()->GetID() - 1; 
+				B(x, Batterycount) += 1.0;
 				C(Batterycount, Bate->GetStartNode()->GetID() - 1) += 1.0;
 			}
 			if (Bate->GetEndNode()->GetID() != 0)
@@ -803,7 +798,7 @@ int main()
 				i(Ba->GetEndNode()->GetID() - 1,0) -= Ba->Value;
 			}
 		}
-		CCCS* Bater = dynamic_cast<CCCS*>(Elements[j]);
+		/*CCCS* Bater = dynamic_cast<CCCS*>(Elements[j]);
 		if (Bater != NULL)
 		{
 			if (Bater->GetStartNode()->GetID() != 0)
@@ -831,7 +826,6 @@ int main()
 				{
 					G(Bat->GetStartNode()->GetID() - 1, Bat->Dend->GetID() - 1) -= Bat->Coff;
 				}
-
 			}
 			
 			if (Bat->GetEndNode()->GetID() != 0)
@@ -844,10 +838,8 @@ int main()
 				{
 					G(Bat->GetEndNode()->GetID() - 1, Bat->Dend->GetID() - 1) += Bat->Coff;
 				}
-
 			}
-			
-		}
+		}*/
 	}
 	for (int k = 0; k < NumberOfElements; k++)
 	{
@@ -956,9 +948,24 @@ res r4 2 3 8
 isrc i1 0 1 3 0
 cccs c1 0 3 1 2 2
 */
-/*w 0
+/*
+w 0
 vsrc V1 1 0 12 0
 res R1 1 2 1000
 res R2 2 0 1000
 res R3 3 0 1000
-ccvs Ha 3 2 1 0 V1 5‏*/
+ccvs Ha 3 2 1 0 V1 5‏
+w 0
+vsrc V1 1 0 12 0
+res R1 1 2 1000
+res R2 2 0 1000
+res R3 3 0 1000
+ccvs Ha 3 2 1 0 V1 5‏
+w 0 
+vsrc v1 1 0 12 0
+res r1 1 2 1000
+res r2 2 0 1000
+res r3 3 0 1000
+ccvs ha 3 2 1 0 v1 5
+
+*/
