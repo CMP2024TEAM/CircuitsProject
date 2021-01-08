@@ -12,6 +12,7 @@ public:
 	void setStartNode(Node*);
 	void setEndNode(Node*);
 	string Name;
+	complex<double>Current;
 protected:
 	Node* StartNode;
 	Node* EndNode;

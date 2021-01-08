@@ -10,11 +10,11 @@ class Node
 {
 public:
 	int ID;
-	complex<float> voltage;
+	complex<double> voltage;
 public:
 	void SetID(int);
-	void SetVoltage(complex<float>);
+	void SetVoltage(complex<double>);
 	int GetID();
-	complex<float> GetVoltage();
+	complex<double> GetVoltage();
 	Node(int);
 };

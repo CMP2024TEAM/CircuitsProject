@@ -16,6 +16,10 @@ double ToRadian(double degree)
 {
 	return degree / 180 * M_PI;
 }
+double ToDegree(double radian)
+{
+	return radian / M_PI * 180;
+}
 bool NodesCreated[10] = { 0 };
 PassiveElements** GetAllPassiveWithNode(Element* E[], int size, Node* N, int& countofelements)
 {
@@ -84,8 +88,8 @@ int main()
 	double o = stod(omega.substr(2, omega.length()));
 	UI.Omega = o;
 	string s;
-	Node* Nodes[10];
-	Element* Elements[11];
+	Node* Nodes[20];
+	Element* Elements[20];
 	int NumberOfElements = 0;
 	do
 	{
@@ -695,7 +699,7 @@ int main()
 			NumberOfElements++;
 		}
 	} while (s != "");
-
+	int ActualNumberOfElements = NumberOfElements;
 	UI.NumberofActualNodes = n;
 	for (int l = 0; l < NumberOfElements; l++)
 	{
@@ -864,7 +868,6 @@ int main()
 			for (int js = 0; js < NumberOfElements; js++)
 				if (Bater->DName == Elements[js]->Name)
 				{
-
 					if (Bater->GetStartNode()->GetID() != 0)
 					{
 						VSRC* Vsrc1 = dynamic_cast<VSRC*>(Elements[js]);
@@ -901,54 +904,9 @@ int main()
 							B(Bater->GetEndNode()->GetID() - 1, Vsrc3->index) += Bater->Coff;
 						}
 					}
-			
 				}
-
 		}
-		/*CCCS* Bater = dynamic_cast<CCCS*>(Elements[j]);
-		if (Bater != NULL)
-		{
-			if (Bater->GetStartNode()->GetID() != 0)
-			{
-				B(Bater->GetStartNode()->GetID() - 1, Batterycount) += Bater->Coff;
-				C(Batterycount, Bater->GetStartNode()->GetID() - 1) += Bater->Coff;
-			}
-			if (Ba->GetEndNode()->GetID() != 0)
-			{
-				B(Bater->GetEndNode()->GetID() - 1, Batterycount) += Bater->Coff;
-				C(Batterycount, Bater->GetEndNode()->GetID() - 1) += Bater->Coff;
-			}
-			Batterycount++;
-		}
-		VCCS* Bat = dynamic_cast<VCCS*>(Elements[j]);
-		if (Bat != NULL)
-		{
-			if (Bat->GetStartNode()->GetID() != 0)
-			{
-				if (Bat->Dstart->GetID() != 0)
-				{
-					G(Bat->GetStartNode()->GetID() - 1, Bat->Dstart->GetID() - 1) += Bat->Coff;
-				}
-				if (Bat->Dend->GetID() != 0)
-				{
-					G(Bat->GetStartNode()->GetID() - 1, Bat->Dend->GetID() - 1) -= Bat->Coff;
-				}
-			}
-
-			if (Bat->GetEndNode()->GetID() != 0)
-			{
-				if (Bat->Dstart->GetID() != 0)
-				{
-					G(Bat->GetEndNode()->GetID() - 1, Bat->Dstart->GetID() - 1) -= Bat->Coff;
-				}
-				if (Bat->Dend->GetID() != 0)
-				{
-					G(Bat->GetEndNode()->GetID() - 1, Bat->Dend->GetID() - 1) += Bat->Coff;
-				}
-			}
-		}*/
 	}
-
 	for (int k = 0; k < NumberOfElements; k++) //Fill D Elements
 	{
 		CCVS* Bate = dynamic_cast<CCVS*>(Elements[k]);
@@ -969,9 +927,7 @@ int main()
 						D(Bate->index, v2->index) -= Bate->Coff;
 					}
 				}
-
 			}
-
 		}
 	}
 	//C = B.transpose();
@@ -979,7 +935,59 @@ int main()
 	A << G, B, C, D;
 	MatrixXcd z(n - 1 + m, 1);
 	z << i, e;
-	cout << A.inverse() * z << endl;
+	MatrixXcd Result = A.inverse() * z;
+	cout <<  Result << endl;
+	Nodes[0]->SetVoltage(0);
+	for (int i = 0;i < n - 1 ;i++)
+	{
+		if (Nodes[i+1] != NULL)
+		{
+			Nodes[i+1]->SetVoltage(Result(i,0));
+		}
+	}
+	for (int i = 0;i < UI.NumberofActualNodes ;i++)
+	{
+		if (Nodes[i] != NULL)
+		{
+			cout << "The Voltage At Node " << i << " Equals " << abs(Nodes[i]->GetVoltage()) << " < " << ToDegree(arg(Nodes[i]->GetVoltage())) << endl;
+		}
+	}
+	for (int i = 0;i < ActualNumberOfElements;i++)
+	{
+		PassiveElements* Pa = dynamic_cast<PassiveElements*>(Elements[i]);
+		if (Pa != NULL)
+		{
+			Elements[i]->Current = (Elements[i]->GetStartNode()->GetVoltage() - Elements[i]->GetEndNode()->GetVoltage()) / Pa->GetZ();
+			cout << "The Current Passing in Element "<<Elements[i]->Name << " Equals "<<abs(Elements[i]->Current)<<" < "<< ToDegree(arg(Elements[i]->Current))<< endl;
+		}
+	}
+	for (int i = 0;i < ActualNumberOfElements;i++)
+	{
+		VSRC* V1 = dynamic_cast<VSRC*>(Elements[i]);
+		if (V1 != NULL)
+		{
+			Elements[i]->Current = Result(V1->index + n - 1,0);
+			cout << "The Current Passing in Element " << Elements[i]->Name << " Equals " << abs(Elements[i]->Current) << " < " << ToDegree(arg(Elements[i]->Current)) << endl;
+		}
+		VCVS* V2 = dynamic_cast<VCVS*>(Elements[i]);
+		if (V2 != NULL)
+		{
+			Elements[i]->Current = Result(V2->index + n - 1, 0);
+			cout << "The Current Passing in Element " << Elements[i]->Name << " Equals " << abs(Elements[i]->Current) << " < " << ToDegree(arg(Elements[i]->Current)) << endl;
+		}
+		CCVS* V3 = dynamic_cast<CCVS*>(Elements[i]);
+		if (V3 != NULL)
+		{
+			Elements[i]->Current = Result(V3->index + n - 1, 0);
+			cout << "The Current Passing in Element " << Elements[i]->Name << " Equals " << abs(Elements[i]->Current) << " < " << ToDegree(arg(Elements[i]->Current)) << endl;
+		}
+		ISRC* I1 = dynamic_cast<ISRC*>(Elements[i]);
+		if (I1 != NULL)
+		{
+			Elements[i]->Current = I1->Value;
+			cout << "The Current Passing in Element " << Elements[i]->Name << " Equals " << abs(Elements[i]->Current) << " < " << ToDegree(arg(Elements[i]->Current)) << endl;
+		}
+	}
 	return 0;
 }
 /*
@@ -1009,7 +1017,6 @@ ind n1 2 3 1‏
 	(-4.33013,-2.5)
  (-10.2409,8.41931)
 */
-
 /*
 W 0
 res r1 1 0 2
@@ -1028,7 +1035,6 @@ isrc i1 1 0 10 -90
 cap c1 1 2 0.2
 vcvs v1 3 0 1 0 3
 */
-
 /*
 W 0
 res r1 1 2 2
@@ -1119,4 +1125,12 @@ final answer
 (1.43564,-0.643564)
 (-0.428218,-0.0321782)
 (0.0717822,-0.0321782)
+*/
+/*
+w 1000
+vsrc vs 1 0 10 30
+ind L1 1 2 .001
+cap C2 2 3 0.0001
+res R3 3 0 10
+
 */
