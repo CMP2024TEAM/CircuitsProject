@@ -616,87 +616,87 @@ int main()
 		}
 		else if (type == "cccs")
 		{
-		string node1 = "", node2 = "", v = "", node3 = "", node4 = "", DN = "";
-		for (; i < s.length(); i++)
-		{
-			if (s[i] == ' ')
+			string node1 = "", node2 = "", v = "", node3 = "", node4 = "", DN = "";
+			for (; i < s.length(); i++)
 			{
-				break;
+				if (s[i] == ' ')
+				{
+					break;
+				}
+				node1 += s[i];
 			}
-			node1 += s[i];
-		}
-		i++;
-		for (; i < s.length(); i++)
-		{
-			if (s[i] == ' ')
+			i++;
+			for (; i < s.length(); i++)
 			{
-				break;
+				if (s[i] == ' ')
+				{
+					break;
+				}
+				node2 += s[i];
 			}
-			node2 += s[i];
-		}
-		i++;
-		for (; i < s.length(); i++)
-		{
-			if (s[i] == ' ')
+			i++;
+			for (; i < s.length(); i++)
 			{
-				break;
+				if (s[i] == ' ')
+				{
+					break;
+				}
+				node3 += s[i];
 			}
-			node3 += s[i];
-		}
-		i++;
-		for (; i < s.length(); i++)
-		{
-			if (s[i] == ' ')
+			i++;
+			for (; i < s.length(); i++)
 			{
-				break;
+				if (s[i] == ' ')
+				{
+					break;
+				}
+				node4 += s[i];
 			}
-			node4 += s[i];
-		}
-		i++;
-		for (; i < s.length(); i++)
-		{
-			if (s[i] == ' ')
+			i++;
+			for (; i < s.length(); i++)
 			{
-				break;
+				if (s[i] == ' ')
+				{
+					break;
+				}
+				DN += s[i];
 			}
-			DN += s[i];
-		}
-		i++;
-		for (; i < s.length(); i++)
-		{
-			if (s[i] == ' ')
+			i++;
+			for (; i < s.length(); i++)
 			{
-				break;
+				if (s[i] == ' ')
+				{
+					break;
+				}
+				v += s[i];
 			}
-			v += s[i];
-		}
-		int N1, N2, N3, N4;
-		double Value;
-		double Phase;
-		N1 = (int)stod(node1);
-		N2 = (int)stod(node2);
-		N3 = (int)stod(node3);
-		N4 = (int)stod(node4);
-		Value = stod(v);
-		if (NodesCreated[N1] == false)
-		{
-			Nodes[N1] = new Node(N1);
-			NodesCreated[N1] = true;
-			n++;
-		}
-		if (NodesCreated[N2] == false)
-		{
-			Nodes[N2] = new Node(N2);
-			NodesCreated[N2] = true;
-			n++;
-		}
+			int N1, N2, N3, N4;
+			double Value;
+			double Phase;
+			N1 = (int)stod(node1);
+			N2 = (int)stod(node2);
+			N3 = (int)stod(node3);
+			N4 = (int)stod(node4);
+			Value = stod(v);
+			if (NodesCreated[N1] == false)
+			{
+				Nodes[N1] = new Node(N1);
+				NodesCreated[N1] = true;
+				n++;
+			}
+			if (NodesCreated[N2] == false)
+			{
+				Nodes[N2] = new Node(N2);
+				NodesCreated[N2] = true;
+				n++;
+			}
 
-		Elements[NumberOfElements] = new CCCS(Nodes[N1], Nodes[N2], name, DN, Value, Nodes[N3], Nodes[N4]);
-		NumberOfElements++;
+			Elements[NumberOfElements] = new CCCS(Nodes[N1], Nodes[N2], name, DN, Value, Nodes[N3], Nodes[N4]);
+			NumberOfElements++;
 		}
 	} while (s != "");
 
-	UI.NumberofActualNodes =n;
+	UI.NumberofActualNodes = n;
 	for (int l = 0; l < NumberOfElements; l++)
 	{
 		CCVS* batr = dynamic_cast<CCVS*> (Elements[l]);
@@ -709,15 +709,15 @@ int main()
 					VCVS* batar3 = dynamic_cast<VCVS*>(Elements[k]);
 					if (batar1 == NULL && batar2 == NULL && batar3 == NULL)
 					{
-						
+
 						Nodes[n] = new Node(n);
-						Elements[NumberOfElements] = new VSRC( Elements[k]->GetStartNode(), Nodes[n], Elements[k]->Name+"src", 0.0);
+						Elements[NumberOfElements] = new VSRC(Elements[k]->GetStartNode(), Nodes[n], Elements[k]->Name + "src", 0.0);
 						Elements[k]->setStartNode(Nodes[n]);
 						batr->DName = Elements[NumberOfElements]->Name;
 						NumberOfElements++;
 						m++;
 						n++;
-						
+
 					}
 				}
 		CCCS* batr1 = dynamic_cast<CCCS*> (Elements[l]);
@@ -842,7 +842,7 @@ int main()
 			Bate->index = Batterycount;
 			Batterycount++;
 		}
-	
+
 	}
 	for (int j = 0; j < NumberOfElements; j++)
 	{
@@ -861,16 +861,48 @@ int main()
 		CCCS* Bater = dynamic_cast<CCCS*>(Elements[j]);
 		if (Bater != NULL)
 		{
-			if (Bater->GetStartNode()->GetID() != 0)
-			{
-				int x = Bater->GetStartNode()->GetID() - 1;
-				B(x, Batterycount) -= Bater->Coff;
-			}
-			if (Bater->GetEndNode()->GetID() != 0)
-			{
-				B(Bater->GetEndNode()->GetID() - 1, Batterycount) += Bater->Coff;
-			}
-			e(Batterycount, 0) = 0;
+			for (int js = 0; js < NumberOfElements; js++)
+				if (Bater->DName == Elements[js]->Name)
+				{
+
+					if (Bater->GetStartNode()->GetID() != 0)
+					{
+						VSRC* Vsrc1 = dynamic_cast<VSRC*>(Elements[js]);
+						if (Vsrc1 != NULL)
+						{
+							B(Bater->GetStartNode()->GetID() - 1, Vsrc1->index) -= Bater->Coff;
+						}
+						VCVS* Vsrc2 = dynamic_cast<VCVS*>(Elements[js]);
+						if (Vsrc2 != NULL)
+						{
+							B(Bater->GetStartNode()->GetID() - 1, Vsrc2->index) -= Bater->Coff;
+						}
+						CCVS* Vsrc3 = dynamic_cast<CCVS*>(Elements[js]);
+						if (Vsrc3 != NULL)
+						{
+							B(Bater->GetStartNode()->GetID() - 1, Vsrc3->index) -= Bater->Coff;
+						}
+					}
+					if (Bater->GetEndNode()->GetID() != 0)
+					{
+						VSRC* Vsrc1 = dynamic_cast<VSRC*>(Elements[js]);
+						if (Vsrc1 != NULL)
+						{
+							B(Bater->GetEndNode()->GetID() - 1, Vsrc1->index) += Bater->Coff;
+						}
+						VCVS* Vsrc2 = dynamic_cast<VCVS*>(Elements[js]);
+						if (Vsrc2 != NULL)
+						{
+							B(Bater->GetEndNode()->GetID() - 1, Vsrc2->index) += Bater->Coff;
+						}
+						CCVS* Vsrc3 = dynamic_cast<CCVS*>(Elements[js]);
+						if (Vsrc3 != NULL)
+						{
+							B(Bater->GetEndNode()->GetID() - 1, Vsrc3->index) += Bater->Coff;
+						}
+					}
+			
+				}
 
 		}
 		/*CCCS* Bater = dynamic_cast<CCCS*>(Elements[j]);
@@ -1051,4 +1083,40 @@ res r3 1 3 4
 res r4 2 3 8
 isrc i1 1 0 3 0
 ccvs c1 3 0 1 2 r1 2
+
+final answer
+ (7.30435,0)
+  (2.6087,0)
+ (4.69565,0)
+ (7.30435,0)
+(0.391304,0)
+ (2.34783,0)
+*/
+/*
+w 0
+vsrc V1 1 0 12 0
+res R1 1 2 1000
+res R2 2 0 1000
+res R3 3 0 1000
+cccs Fa 3 2 1 0 V1 5
+*/
+/*
+w 1000
+vsrc v1 1 0 10 0
+res r1 1 2 20
+res r2 2 0 20
+cap c1 2 3 0.00005
+cccs i1 0 3 0 2 r2 4
+ind l1 3 4 0.01
+res r3 4 0 30
+
+final answer
+
+(10,0)
+(1.43564,-0.643564)
+(0.148515,6.48515)
+(2.07921,5.79208)
+(1.43564,-0.643564)
+(-0.428218,-0.0321782)
+(0.0717822,-0.0321782)
 */
