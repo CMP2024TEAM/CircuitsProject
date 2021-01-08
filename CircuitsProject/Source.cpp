@@ -862,9 +862,7 @@ int main()
 						D(Bate->index, v2->index) -= Bate->Coff;
 					}
 				}
-					
 			}
-			
 		}
 	}
 	//C = B.transpose();
@@ -973,6 +971,7 @@ final answer
 (-0.00798669,0)
 (-0.00397338,0)
 */
+/*
 ccvs Ha 3 2 1 0 V1 5‏
 w 0 
 vsrc v1 1 0 12 0
