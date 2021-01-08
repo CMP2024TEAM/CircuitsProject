@@ -936,37 +936,37 @@ int main()
 	MatrixXcd z(n - 1 + m, 1);
 	z << i, e;
 	MatrixXcd Result = A.inverse() * z;
-	cout <<  Result << endl;
+	cout << Result << endl;
 	Nodes[0]->SetVoltage(0);
-	for (int i = 0;i < n - 1 ;i++)
+	for (int i = 0; i < n - 1; i++)
 	{
-		if (Nodes[i+1] != NULL)
+		if (Nodes[i + 1] != NULL)
 		{
-			Nodes[i+1]->SetVoltage(Result(i,0));
+			Nodes[i + 1]->SetVoltage(Result(i, 0));
 		}
 	}
-	for (int i = 0;i < UI.NumberofActualNodes ;i++)
+	for (int i = 0; i < UI.NumberofActualNodes; i++)
 	{
 		if (Nodes[i] != NULL)
 		{
 			cout << "The Voltage At Node " << i << " Equals " << abs(Nodes[i]->GetVoltage()) << " < " << ToDegree(arg(Nodes[i]->GetVoltage())) << endl;
 		}
 	}
-	for (int i = 0;i < ActualNumberOfElements;i++)
+	for (int i = 0; i < ActualNumberOfElements; i++)
 	{
 		PassiveElements* Pa = dynamic_cast<PassiveElements*>(Elements[i]);
 		if (Pa != NULL)
 		{
 			Elements[i]->Current = (Elements[i]->GetStartNode()->GetVoltage() - Elements[i]->GetEndNode()->GetVoltage()) / Pa->GetZ();
-			cout << "The Current Passing in Element "<<Elements[i]->Name << " Equals "<<abs(Elements[i]->Current)<<" < "<< ToDegree(arg(Elements[i]->Current))<< endl;
+			cout << "The Current Passing in Element " << Elements[i]->Name << " Equals " << abs(Elements[i]->Current) << " < " << ToDegree(arg(Elements[i]->Current)) << endl;
 		}
 	}
-	for (int i = 0;i < ActualNumberOfElements;i++)
+	for (int i = 0; i < ActualNumberOfElements; i++)
 	{
 		VSRC* V1 = dynamic_cast<VSRC*>(Elements[i]);
 		if (V1 != NULL)
 		{
-			Elements[i]->Current = Result(V1->index + n - 1,0);
+			Elements[i]->Current = Result(V1->index + n - 1, 0);
 			cout << "The Current Passing in Element " << Elements[i]->Name << " Equals " << abs(Elements[i]->Current) << " < " << ToDegree(arg(Elements[i]->Current)) << endl;
 		}
 		VCVS* V2 = dynamic_cast<VCVS*>(Elements[i]);
@@ -986,6 +986,34 @@ int main()
 		{
 			Elements[i]->Current = I1->Value;
 			cout << "The Current Passing in Element " << Elements[i]->Name << " Equals " << abs(Elements[i]->Current) << " < " << ToDegree(arg(Elements[i]->Current)) << endl;
+		}
+
+	}
+	for (int ic = ActualNumberOfElements; ic < NumberOfElements; ic++)//get new current
+	{
+		VSRC* V1 = dynamic_cast<VSRC*>(Elements[ic]);
+		if (V1 != NULL)
+		{
+			Elements[ic]->Current = Result(V1->index + n - 1, 0);
+		}
+	}
+	for (int i = 0; i < ActualNumberOfElements; i++)//set current in branch of VCCS and CCCS 
+	{
+		VCCS* C1 = dynamic_cast<VCCS*>(Elements[i]);
+		if (C1 != NULL)
+		{
+			Elements[i]->Current = (C1->Dstart->GetVoltage() - C1->Dend->GetVoltage()) * C1->Coff;
+			cout << "The Current Passing in Element " << Elements[i]->Name << " Equals " << abs(Elements[i]->Current) << " < " << ToDegree(arg(Elements[i]->Current)) << endl;
+		}
+		CCCS* C2 = dynamic_cast<CCCS*>(Elements[i]);
+		if (C2 != NULL)
+		{
+			for (int ic = 0; ic < NumberOfElements; ic++)
+				if (Elements[ic]->Name == C2->DName)
+				{
+					Elements[i]->Current = Elements[ic]->Current * C2->Coff;
+					cout << "The Current Passing in Element " << Elements[i]->Name << " Equals " << abs(Elements[i]->Current) << " < " << ToDegree(arg(Elements[i]->Current)) << endl;
+				}
 		}
 	}
 	return 0;
@@ -1133,4 +1161,18 @@ ind L1 1 2 .001
 cap C2 2 3 0.0001
 res R3 3 0 10
 
+*/
+/*
+w 0
+res r1 0 1 10
+vsrc v1 1 0 10 0
+*/
+/*
+w 0
+res r1 2 1 10
+res r2 3 1 24
+res r3 3 2 4
+res r4 0 2 12
+vsrc v 1 0 24 0
+ccvs v2 2 0 2 1 r1 4
 */
