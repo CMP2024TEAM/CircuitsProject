@@ -1174,3 +1174,12 @@ res r4 0 2 12
 vsrc v 1 0 24 0
 ccvs v2 3 0 2 1 r1 4
 */
+/*
+W 0
+res r1 1 2 2
+res r2 0 2 4
+res r3 1 3 4
+res r4 2 3 8
+isrc i1 1 0 3 0
+cccs c1 0 3 2 1 r1 2
+*/
