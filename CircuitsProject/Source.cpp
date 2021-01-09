@@ -91,6 +91,7 @@ int main()
 	Node* Nodes[20];
 	Element* Elements[20];
 	int NumberOfElements = 0;
+	// Input 
 	do
 	{
 		getline(cin, s);
@@ -701,6 +702,7 @@ int main()
 	} while (s != "");
 	int ActualNumberOfElements = NumberOfElements;
 	UI.NumberofActualNodes = n;
+	// Adding New VSRC for Current Dependent Sources (CCVS & CCCS)
 	for (int l = 0; l < NumberOfElements; l++)
 	{
 		CCVS* batr = dynamic_cast<CCVS*> (Elements[l]);
@@ -756,6 +758,7 @@ int main()
 	B.setZero();
 	C.setZero();
 	D.setZero();
+	// Fill G Matrix With 1/Z
 	for (int i = 0; i < n - 1; i++)
 	{
 		for (int j = i; j < n - 1; j++)
@@ -782,6 +785,7 @@ int main()
 		}
 	}
 	int Batterycount = 0;
+	// Fill B , C and E Matrices
 	for (int i = 0; i < NumberOfElements; i++)
 	{
 		VSRC* Ba = dynamic_cast<VSRC*>(Elements[i]);
@@ -846,6 +850,7 @@ int main()
 		}
 
 	}
+	// Current Sources ISRC And CCCS
 	for (int j = 0; j < NumberOfElements; j++)
 	{
 		ISRC* Ba = dynamic_cast<ISRC*>(Elements[j]);
@@ -905,6 +910,7 @@ int main()
 				}
 		}
 	}
+	// Fill D Matrix (CCVS) 
 	for (int k = 0; k < NumberOfElements; k++) //Fill D Elements
 	{
 		CCVS* Bate = dynamic_cast<CCVS*>(Elements[k]);
@@ -928,13 +934,43 @@ int main()
 			}
 		}
 	}
-	//C = B.transpose();
+	// Fill G (VCCS)
+	for (int i = 0;i < NumberOfElements;i++)
+	{
+		VCCS* V = dynamic_cast<VCCS*>(Elements[i]);
+		if (V !=NULL)
+		{
+			if (V->GetStartNode()->GetID() != 0)
+			{
+				if (V->Dstart->GetID() != 0)
+				{
+					G(V->GetStartNode()->GetID() - 1, V->Dstart->GetID() - 1) -= V->Coff;
+				}
+				if (V->Dend->GetID() != 0)
+				{
+					G(V->GetStartNode()->GetID() - 1, V->Dend->GetID() - 1) += V->Coff;
+				}
+			}
+			if (V->GetEndNode()->GetID() != 0)
+			{
+				if (V->Dstart->GetID() != 0)
+				{
+					G(V->GetEndNode()->GetID() - 1, V->Dstart->GetID() - 1) += V->Coff;
+				}
+				if (V->Dend->GetID() != 0)
+				{
+					G(V->GetEndNode()->GetID() - 1, V->Dend->GetID() - 1) -= V->Coff;
+				}
+			}
+		}
+	}
 	MatrixXcd A(n - 1 + m, n - 1 + m);
 	A << G, B, C, D;
 	MatrixXcd z(n - 1 + m, 1);
 	z << i, e;
 	MatrixXcd Result = A.inverse() * z;
 	cout << Result << endl;
+	// Setting Voltages 
 	Nodes[0]->SetVoltage(0);
 	for (int i = 0; i < n - 1; i++)
 	{
@@ -943,6 +979,7 @@ int main()
 			Nodes[i + 1]->SetVoltage(Result(i, 0));
 		}
 	}
+	// Output
 	for (int i = 0; i < UI.NumberofActualNodes; i++)
 	{
 		if (Nodes[i] != NULL)
@@ -1183,14 +1220,37 @@ res r4 2 3 8
 isrc i1 1 0 3 0
 cccs c1 0 3 2 1 r1 2
 */
+/*
 ccvs v2 3 0 2 1 r1 4
 */
-/*w 0
-res r1 1 2 40000
-res r2 2 3 10000
-res r3 4 0 5000
-res r4 3 0 5000‏
+/*
+w 0
+res r1 1 2 40
+res r2 2 3 10
+res r3 4 0 5
+res r4 3 0 5‏
 vsrc v1 1 0 5 0
 vsrc v2 3 4 3 0
 ccvs v3 2 4 1 0 v1 10
+*/
+/*
+w 0
+res r1 1 3 2
+res r2 3 4 1
+res r3 1 2 1
+res r4 0 4 2
+vsrc v1 3 0 2 0
+isrc i1 0 1 9 0
+ccvs v3 4 2 4 0 r4 3
+vccs i3 2 0 3 1 2
+*/
+/*
+w 0
+res r1 1 2 5
+res r2 2 0 20
+res r3 3 4 10
+vsrc v1 1 0 10 0
+isrc i1 3 4 5 0
+vccs i2 2 3 3 4 0.4
+ccvs v2 4 0 2 1 r1 2
 */
