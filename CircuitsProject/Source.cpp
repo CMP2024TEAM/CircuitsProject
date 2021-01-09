@@ -1174,5 +1174,14 @@ res r2 3 1 24
 res r3 3 2 4
 res r4 0 2 12
 vsrc v 1 0 24 0
-ccvs v2 2 0 2 1 r1 4
+ccvs v2 3 0 2 1 r1 4
+*/
+/*w 0
+res r1 1 2 40000
+res r2 2 3 10000
+res r3 4 0 5000
+res r4 3 0 5000‏
+vsrc v1 1 0 5 0
+vsrc v2 3 4 3 0
+ccvs v3 2 4 1 0 v1 10
 */
