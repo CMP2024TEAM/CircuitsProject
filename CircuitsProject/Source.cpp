@@ -969,7 +969,7 @@ int main()
 	MatrixXcd z(n - 1 + m, 1);
 	z << i, e;
 	MatrixXcd Result = A.inverse() * z;
-	cout << Result << endl;
+	//cout << Result << endl;
 	// Setting Voltages 
 	Nodes[0]->SetVoltage(0);
 	for (int i = 0; i < n - 1; i++)
@@ -1253,4 +1253,35 @@ vsrc v1 1 0 10 0
 isrc i1 3 4 5 0
 vccs i2 2 3 3 4 0.4
 ccvs v2 4 0 2 1 r1 2
+*/
+/*
+	Referenece Examples
+	Section 10
+*Prob 10.1
+w 10
+vsrc v1 1 0 2 0
+res r1 1 2 1
+cap c1 2 0 1
+ind i1 2 0 1
+res r2 2 0 1
+SS : 1.97037 < 5.6533
+---------------------
+*Prob 
+10.10
+w 2000
+isrc i1 1 0 36 -90
+vccs i2 0 2 1 0 0.1
+res r1 1 0 2000
+res r2 2 0 4000
+ind i1 1 0 0.05
+cap c1 2 1 0.000002
+----------------------
+w 1
+vsrc v1 1 0 12 0
+cccs i1 3 2 2 1 r1 3
+res r1 2 1 4
+res r2 0 3 2
+cap c1 2 0 0.25
+cap c2 3 0 0.125
+ind i1 3 2 2
 */
