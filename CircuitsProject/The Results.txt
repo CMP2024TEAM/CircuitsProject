@@ -1,9 +1,9 @@
-The Voltage At Node 0 Equals 0 < 0
-The Voltage At Node 1 Equals 7.33333 < 180
-The Voltage At Node 2 Equals 5.33333 < 180
-The Current Passing in Element r1 Equals 0.2 < 180
-The Current Passing in Element r2 Equals 3.66667 < 0
-The Current Passing in Element r3 Equals 1.33333 < 0
-The Current Passing in Element v1 Equals 5.86667 < 180
-The Current Passing in Element i1 Equals 2 < 0
-The Current Passing in Element i2 Equals 7 < 0
+The Voltage At Node 0 Equals 0
+The Voltage At Node 1 Equals 12
+The Voltage At Node 2 Equals 4.01331
+The Voltage At Node 3 Equals 3.97338
+The Current Passing in Element R1 Equals 0.00798669
+The Current Passing in Element R2 Equals 0.00401331
+The Current Passing in Element R3 Equals 0.00397338
+The Current Passing in Element V1 Equals -0.00798669
+The Current Passing in Element Ha Equals -0.00397338
