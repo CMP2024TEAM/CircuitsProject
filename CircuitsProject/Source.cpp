@@ -1183,14 +1183,14 @@ res r4 2 3 8
 isrc i1 1 0 3 0
 cccs c1 0 3 2 1 r1 2
 */
-ccvs v2 3 0 2 1 r1 4
-*/
+
+
 /*w 0
-res r1 1 2 40000
-res r2 2 3 10000
-res r3 4 0 5000
-res r4 3 0 5000‏
+res r1 1 2 40
+res r2 2 3 10
+res r3 4 0 5
+res r4 3 0 5‏
 vsrc v1 1 0 5 0
 vsrc v2 3 4 3 0
-ccvs v3 2 4 1 0 v1 10
+ccvs v3 2 4 0 1 v1 10
 */
