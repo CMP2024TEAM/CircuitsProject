@@ -8,6 +8,7 @@
 #include"Capacitor.h"
 #include"Inductor.h"
 #include"Sources.h"
+#include<fstream>
 # define M_PI          3.141592653589793238462643383279502884L /* pi */
 using namespace std;
 using namespace Eigen;
@@ -84,16 +85,21 @@ int main()
 	UI.Omega = 0;
 	int n = 0, m = 0;
 	string omega;
-	getline(cin, omega);
+	ifstream netlist;
+	ofstream netlist2;
+	netlist2.open("The Results.txt");
+	netlist.open("netlist.txt");
+	getline(netlist, omega);
 	double o = stod(omega.substr(2, omega.length()));
 	UI.Omega = o;
 	string s;
 	Node* Nodes[20];
 	Element* Elements[20];
 	int NumberOfElements = 0;
+	// Input 
 	do
 	{
-		getline(cin, s);
+		getline(netlist, s);
 		string type = "";
 		string name = "";
 		int i = 0;
@@ -698,9 +704,10 @@ int main()
 			Elements[NumberOfElements] = new CCCS(Nodes[N1], Nodes[N2], name, DN, Value, Nodes[N3], Nodes[N4]);
 			NumberOfElements++;
 		}
-	} while (s != "");
+	} while (s != ""&&!(netlist.eof()));
 	int ActualNumberOfElements = NumberOfElements;
 	UI.NumberofActualNodes = n;
+	// Adding New VSRC for Current Dependent Sources (CCVS & CCCS)
 	for (int l = 0; l < NumberOfElements; l++)
 	{
 		CCVS* batr = dynamic_cast<CCVS*> (Elements[l]);
@@ -756,6 +763,7 @@ int main()
 	B.setZero();
 	C.setZero();
 	D.setZero();
+	// Fill G Matrix With 1/Z
 	for (int i = 0; i < n - 1; i++)
 	{
 		for (int j = i; j < n - 1; j++)
@@ -782,6 +790,7 @@ int main()
 		}
 	}
 	int Batterycount = 0;
+	// Fill B , C and E Matrices
 	for (int i = 0; i < NumberOfElements; i++)
 	{
 		VSRC* Ba = dynamic_cast<VSRC*>(Elements[i]);
@@ -846,6 +855,7 @@ int main()
 		}
 
 	}
+	// Current Sources ISRC And CCCS
 	for (int j = 0; j < NumberOfElements; j++)
 	{
 		ISRC* Ba = dynamic_cast<ISRC*>(Elements[j]);
@@ -905,6 +915,7 @@ int main()
 				}
 		}
 	}
+	// Fill D Matrix (CCVS) 
 	for (int k = 0; k < NumberOfElements; k++) //Fill D Elements
 	{
 		CCVS* Bate = dynamic_cast<CCVS*>(Elements[k]);
@@ -928,13 +939,43 @@ int main()
 			}
 		}
 	}
-	//C = B.transpose();
+	// Fill G (VCCS)
+	for (int i = 0;i < NumberOfElements;i++)
+	{
+		VCCS* V = dynamic_cast<VCCS*>(Elements[i]);
+		if (V !=NULL)
+		{
+			if (V->GetStartNode()->GetID() != 0)
+			{
+				if (V->Dstart->GetID() != 0)
+				{
+					G(V->GetStartNode()->GetID() - 1, V->Dstart->GetID() - 1) -= V->Coff;
+				}
+				if (V->Dend->GetID() != 0)
+				{
+					G(V->GetStartNode()->GetID() - 1, V->Dend->GetID() - 1) += V->Coff;
+				}
+			}
+			if (V->GetEndNode()->GetID() != 0)
+			{
+				if (V->Dstart->GetID() != 0)
+				{
+					G(V->GetEndNode()->GetID() - 1, V->Dstart->GetID() - 1) += V->Coff;
+				}
+				if (V->Dend->GetID() != 0)
+				{
+					G(V->GetEndNode()->GetID() - 1, V->Dend->GetID() - 1) -= V->Coff;
+				}
+			}
+		}
+	}
 	MatrixXcd A(n - 1 + m, n - 1 + m);
 	A << G, B, C, D;
 	MatrixXcd z(n - 1 + m, 1);
 	z << i, e;
 	MatrixXcd Result = A.inverse() * z;
-	cout << Result << endl;
+	//cout << Result << endl;
+	// Setting Voltages 
 	Nodes[0]->SetVoltage(0);
 	for (int i = 0; i < n - 1; i++)
 	{
@@ -943,11 +984,21 @@ int main()
 			Nodes[i + 1]->SetVoltage(Result(i, 0));
 		}
 	}
+	// Output
 	for (int i = 0; i < UI.NumberofActualNodes; i++)
 	{
 		if (Nodes[i] != NULL)
 		{
-			cout << "The Voltage At Node " << i << " Equals " << abs(Nodes[i]->GetVoltage()) << " < " << ToDegree(arg(Nodes[i]->GetVoltage())) << endl;
+			if (UI.Omega == 0)
+			{
+				cout << "The Voltage At Node " << i << " Equals " << real(Nodes[i]->GetVoltage()) << endl;
+				netlist2 << "The Voltage At Node " << i << " Equals " << real(Nodes[i]->GetVoltage()) << endl;
+			}
+			else
+			{
+				cout << "The Voltage At Node " << i << " Equals " << abs(Nodes[i]->GetVoltage()) << " < " << ToDegree(arg(Nodes[i]->GetVoltage())) << endl;
+				netlist2 << "The Voltage At Node " << i << " Equals " << abs(Nodes[i]->GetVoltage()) << " < " << ToDegree(arg(Nodes[i]->GetVoltage())) << endl;
+			}
 		}
 	}
 	for (int i = 0; i < ActualNumberOfElements; i++)
@@ -956,7 +1007,16 @@ int main()
 		if (Pa != NULL)
 		{
 			Elements[i]->Current = (Elements[i]->GetStartNode()->GetVoltage() - Elements[i]->GetEndNode()->GetVoltage()) / Pa->GetZ();
-			cout << "The Current Passing in Element " << Elements[i]->Name << " Equals " << abs(Elements[i]->Current) << " < " << ToDegree(arg(Elements[i]->Current)) << endl;
+			if (UI.Omega == 0)
+			{
+				cout << "The Current Passing in Element " << Elements[i]->Name << " Equals " << real(Elements[i]->Current) << endl;
+				netlist2 << "The Current Passing in Element " << Elements[i]->Name << " Equals " << real(Elements[i]->Current) << endl;
+			}
+			else
+			{
+				cout << "The Current Passing in Element " << Elements[i]->Name << " Equals " << abs(Elements[i]->Current) << " < " << ToDegree(arg(Elements[i]->Current)) << endl;
+				netlist2 << "The Current Passing in Element " << Elements[i]->Name << " Equals " << abs(Elements[i]->Current) << " < " << ToDegree(arg(Elements[i]->Current)) << endl;
+			}
 		}
 	}
 	for (int i = 0; i < ActualNumberOfElements; i++)
@@ -965,25 +1025,61 @@ int main()
 		if (V1 != NULL)
 		{
 			Elements[i]->Current = Result(V1->index + n - 1, 0);
-			cout << "The Current Passing in Element " << Elements[i]->Name << " Equals " << abs(Elements[i]->Current) << " < " << ToDegree(arg(Elements[i]->Current)) << endl;
+			if (UI.Omega == 0)
+			{
+				cout << "The Current Passing in Element " << Elements[i]->Name << " Equals " << real(Elements[i]->Current) << endl;
+				netlist2 << "The Current Passing in Element " << Elements[i]->Name << " Equals " << real(Elements[i]->Current) << endl;
+			}
+			else
+			{
+				cout << "The Current Passing in Element " << Elements[i]->Name << " Equals " << abs(Elements[i]->Current) << " < " << ToDegree(arg(Elements[i]->Current)) << endl;
+				netlist2 << "The Current Passing in Element " << Elements[i]->Name << " Equals " << abs(Elements[i]->Current) << " < " << ToDegree(arg(Elements[i]->Current)) << endl;
+			}
 		}
 		VCVS* V2 = dynamic_cast<VCVS*>(Elements[i]);
 		if (V2 != NULL)
 		{
 			Elements[i]->Current = Result(V2->index + n - 1, 0);
-			cout << "The Current Passing in Element " << Elements[i]->Name << " Equals " << abs(Elements[i]->Current) << " < " << ToDegree(arg(Elements[i]->Current)) << endl;
+			if (UI.Omega == 0)
+			{
+				cout << "The Current Passing in Element " << Elements[i]->Name << " Equals " << real(Elements[i]->Current) << endl;
+				netlist2 << "The Current Passing in Element " << Elements[i]->Name << " Equals " << real(Elements[i]->Current) << endl;
+			}
+			else
+			{
+				cout << "The Current Passing in Element " << Elements[i]->Name << " Equals " << abs(Elements[i]->Current) << " < " << ToDegree(arg(Elements[i]->Current)) << endl;
+				netlist2 << "The Current Passing in Element " << Elements[i]->Name << " Equals " << abs(Elements[i]->Current) << " < " << ToDegree(arg(Elements[i]->Current)) << endl;
+			}
 		}
 		CCVS* V3 = dynamic_cast<CCVS*>(Elements[i]);
 		if (V3 != NULL)
 		{
 			Elements[i]->Current = Result(V3->index + n - 1, 0);
-			cout << "The Current Passing in Element " << Elements[i]->Name << " Equals " << abs(Elements[i]->Current) << " < " << ToDegree(arg(Elements[i]->Current)) << endl;
+			if (UI.Omega == 0)
+			{
+				cout << "The Current Passing in Element " << Elements[i]->Name << " Equals " << real(Elements[i]->Current) << endl;
+				netlist2 << "The Current Passing in Element " << Elements[i]->Name << " Equals " << real(Elements[i]->Current) << endl;
+			}
+			else
+			{
+				cout << "The Current Passing in Element " << Elements[i]->Name << " Equals " << abs(Elements[i]->Current) << " < " << ToDegree(arg(Elements[i]->Current)) << endl;
+				netlist2 << "The Current Passing in Element " << Elements[i]->Name << " Equals " << abs(Elements[i]->Current) << " < " << ToDegree(arg(Elements[i]->Current)) << endl;
+			}
 		}
 		ISRC* I1 = dynamic_cast<ISRC*>(Elements[i]);
 		if (I1 != NULL)
 		{
 			Elements[i]->Current = I1->Value;
-			cout << "The Current Passing in Element " << Elements[i]->Name << " Equals " << abs(Elements[i]->Current) << " < " << ToDegree(arg(Elements[i]->Current)) << endl;
+			if (UI.Omega == 0)
+			{
+				cout << "The Current Passing in Element " << Elements[i]->Name << " Equals " << real(Elements[i]->Current) << endl;
+				netlist2 << "The Current Passing in Element " << Elements[i]->Name << " Equals " << real(Elements[i]->Current) << endl;
+			}
+			else
+			{
+				cout << "The Current Passing in Element " << Elements[i]->Name << " Equals " << abs(Elements[i]->Current) << " < " << ToDegree(arg(Elements[i]->Current)) << endl;
+				netlist2 << "The Current Passing in Element " << Elements[i]->Name << " Equals " << abs(Elements[i]->Current) << " < " << ToDegree(arg(Elements[i]->Current)) << endl;
+			}
 		}
 
 	}
@@ -1001,7 +1097,16 @@ int main()
 		if (C1 != NULL)
 		{
 			Elements[i]->Current = (C1->Dstart->GetVoltage() - C1->Dend->GetVoltage()) * C1->Coff;
-			cout << "The Current Passing in Element " << Elements[i]->Name << " Equals " << abs(Elements[i]->Current) << " < " << ToDegree(arg(Elements[i]->Current)) << endl;
+			if (UI.Omega == 0)
+			{
+				cout << "The Current Passing in Element " << Elements[i]->Name << " Equals " << real(Elements[i]->Current) << endl;
+				netlist2 << "The Current Passing in Element " << Elements[i]->Name << " Equals " << real(Elements[i]->Current)<< endl;
+			}
+			else
+			{
+				cout << "The Current Passing in Element " << Elements[i]->Name << " Equals " << abs(Elements[i]->Current) << " < " << ToDegree(arg(Elements[i]->Current)) << endl;
+				netlist2 << "The Current Passing in Element " << Elements[i]->Name << " Equals " << abs(Elements[i]->Current) << " < " << ToDegree(arg(Elements[i]->Current)) << endl;
+			}
 		}
 		CCCS* C2 = dynamic_cast<CCCS*>(Elements[i]);
 		if (C2 != NULL)
@@ -1010,7 +1115,16 @@ int main()
 				if (Elements[ic]->Name == C2->DName)
 				{
 					Elements[i]->Current = Elements[ic]->Current * C2->Coff;
-					cout << "The Current Passing in Element " << Elements[i]->Name << " Equals " << abs(Elements[i]->Current) << " < " << ToDegree(arg(Elements[i]->Current)) << endl;
+					if (UI.Omega == 0)
+					{
+						cout << "The Current Passing in Element " << Elements[i]->Name << " Equals " << real(Elements[i]->Current) << endl;
+						netlist2 << "The Current Passing in Element " << Elements[i]->Name << " Equals " << real(Elements[i]->Current) << endl;
+					}
+					else
+					{
+						cout << "The Current Passing in Element " << Elements[i]->Name << " Equals " << abs(Elements[i]->Current) << " < " << ToDegree(arg(Elements[i]->Current)) << endl;
+						netlist2 << "The Current Passing in Element " << Elements[i]->Name << " Equals " << abs(Elements[i]->Current) << " < " << ToDegree(arg(Elements[i]->Current)) << endl;
+					}
 				}
 		}
 	}
@@ -1108,23 +1222,6 @@ final answer
 (-0.00397338,0)
 */
 /*
-W 0
-res r1 1 2 2
-res r2 0 2 1
-res r3 1 3 4
-res r4 2 3 8
-isrc i1 1 0 3 0
-ccvs c1 3 0 1 2 r1 2
-
-final answer
- (7.30435,0)
-  (2.6087,0)
- (4.69565,0)
- (7.30435,0)
-(0.391304,0)
- (2.34783,0)
-*/
-/*
 w 0
 vsrc V1 1 0 12 0
 res R1 1 2 1000
@@ -1183,14 +1280,68 @@ res r4 2 3 8
 isrc i1 1 0 3 0
 cccs c1 0 3 2 1 r1 2
 */
-
-
-/*w 0
+/*
+ccvs v2 3 0 2 1 r1 4
+*/
+/*
+w 0
 res r1 1 2 40
 res r2 2 3 10
 res r3 4 0 5
 res r4 3 0 5‏
 vsrc v1 1 0 5 0
 vsrc v2 3 4 3 0
-ccvs v3 2 4 0 1 v1 10
+ccvs v3 2 4 1 0 v1 10
+*/
+/*
+w 0
+res r1 1 3 2
+res r2 3 4 1
+res r3 1 2 1
+res r4 0 4 2
+vsrc v1 3 0 2 0
+isrc i1 0 1 9 0
+ccvs v3 4 2 4 0 r4 3
+vccs i3 2 0 3 1 2
+*/
+/*
+w 0
+res r1 1 2 5
+res r2 2 0 20
+res r3 3 4 10
+vsrc v1 1 0 10 0
+isrc i1 3 4 5 0
+vccs i2 2 3 3 4 0.4
+ccvs v2 4 0 2 1 r1 2
+*/
+/*
+	Referenece Examples
+	Section 10
+*Prob 10.1
+w 10
+vsrc v1 1 0 2 0
+res r1 1 2 1
+cap c1 2 0 1
+ind i1 2 0 1
+res r2 2 0 1
+SS : 1.97037 < 5.6533
+---------------------
+*Prob 
+10.10
+w 2000
+isrc i1 1 0 36 -90
+vccs i2 0 2 1 0 0.1
+res r1 1 0 2000
+res r2 2 0 4000
+ind i1 1 0 0.05
+cap c1 2 1 0.000002
+----------------------
+w 1
+vsrc v1 1 0 12 0
+cccs i1 3 2 2 1 r1 3
+res r1 2 1 4
+res r2 0 3 2
+cap c1 2 0 0.25
+cap c2 3 0 0.125
+ind i1 3 2 2
 */
