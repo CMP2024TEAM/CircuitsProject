@@ -1,6 +1,7 @@
 w 0
-vsrc V1 1 0 12 0
-res R1 1 2 1000
-res R2 2 0 1000
-res R3 3 0 1000
-ccvs Ha 3 2 1 0 V1 5‏
+res r1 1 2 10000
+res r2 2 3 20000
+res r3 3 0 15000
+res r4 2 0 10000
+vsrc v1 1 0 1 0
+vccs i1 0 3 1 2 0.0002
